@@ -106,12 +106,14 @@ exports.Lexer = class Lexer
     idLength = id.length
     poppedToken = undefined
 
-    if id is 'own' and @tag() is 'FOR'
-      @token 'OWN', id
-      return id.length
-    if id is 'from' and @tag() is 'YIELD'
-      @token 'FROM', id
-      return id.length
+    if id in ['von', 'from'] and @tag() is 'YIELD'
+      @token 'FROM', 'from'
+      return idLength
+
+    if id in ['eigene', 'own'] and @tag() is 'FOR'
+      @token 'OWN', 'own'
+      return idLength
+
     [..., prev] = @tokens
     forcedIdentifier = colon or prev? and
       (prev[0] in ['.', '?.', '::', '?::'] or
@@ -119,6 +121,7 @@ exports.Lexer = class Lexer
     tag = 'IDENTIFIER'
 
     if not forcedIdentifier and (id in JS_KEYWORDS or id in COFFEE_KEYWORDS)
+      id  = COFFEE_ALIAS_MAP[id] if id in COFFEE_ALIASES
       tag = id.toUpperCase()
       if tag is 'WHEN' and @tag() in LINE_BREAK
         tag = 'LEADING_WHEN'
@@ -760,6 +763,42 @@ COFFEE_ALIAS_MAP =
   no   : 'false'
   on   : 'true'
   off  : 'false'
+  neu : 'new'
+  lösche : 'delete'
+  gibzurück : 'return'
+  anhalten : 'break'
+  fortsetzen: 'continue'
+  liefere: 'yield'
+  wenn : 'if'
+  dann : 'then'
+  sonst: 'else'
+  esseidenn: 'unless'
+  schleife: 'loop'
+  jenachdem: 'switch'
+  für: 'for'
+  während: 'while'
+  tue: 'do'
+  klasse: 'class'
+  erweitert: 'extends'
+  undefiniert: 'undefined'
+  bis: 'until'
+  sofern: 'when'
+  von: 'of'
+  alle: 'by'
+  eigene: 'own'
+  ist: '=='
+  istnicht: '!='
+  nicht: '!'
+  wahr : 'true'
+  falsch : 'false'
+  ja: 'true'
+  nein: 'false'
+  an: 'true'
+  aus: 'false'
+  und: '&&'
+  oder: '||'
+
+
 
 COFFEE_ALIASES  = (key for key of COFFEE_ALIAS_MAP)
 COFFEE_KEYWORDS = COFFEE_KEYWORDS.concat COFFEE_ALIASES
